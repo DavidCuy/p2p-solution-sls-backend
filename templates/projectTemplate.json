@@ -1,0 +1,747 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Parameters": {
+    "AppName": {
+      "Type": "String",
+      "Description": "App Name.",
+      "Default": "p2p-solution"
+    },
+    "Environment": {
+      "Type": "String",
+      "Description": "Environment name."
+    },
+    "ArtifactsBucket": {
+      "Type": "String",
+      "Description": "Bucket where all artifacts will be saved.",
+      "Default": ""
+    },
+    "SubnetsIds": {
+      "Type": "String"
+    },
+    "SecurityGroup": {
+      "Type": "String"
+    },
+    "VpcId": {
+      "Type": "String"
+    },
+    "AllResources": {
+      "Type": "String",
+      "Default": "*"
+    }
+  },
+  "Resources": {
+    "RolLambda": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaLogPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:SendMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes",
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:GetQueueUrl"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaSQSPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeInstances",
+                    "ec2:AttachNetworkInterface"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaVpcPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:DescribeStream",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetShardIterator",
+                    "dynamodb:ListStreams",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:ExportTableToPointInTime",
+                    "dynamodb:BatchWriteItem"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-dynamoDbPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:GetResourcePolicy",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:DescribeSecret",
+                    "secretsmanager:ListSecretVersionIds"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:GetRandomPassword",
+                    "secretsmanager:ListSecrets"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaSecretsManagerPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "kms:*",
+                  "Resource": {
+                    "Ref": "AllResources"
+                  }
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaKmsPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "xray:PutTraceSegments",
+                    "xray:PutTelemetryRecords",
+                    "xray:GetTraceSummaries"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-x-ray-access"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-s3-log-access"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "amplify:*"
+                  ],
+                  "Resource": {
+                    "Ref": "AllResources"
+                  }
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-amplify-access"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*"
+                  }
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaSSMPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sts:AssumeRole"
+                  ],
+                  "Resource": {
+                    "Ref": "AllResources"
+                  }
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-lambdaAssumeRolePermissionMigration"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution",
+                    "states:DescribeExecution",
+                    "states:StopExecution",
+                    "states:ListExecutions"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-step-function-access"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "events:PutTargets",
+                    "events:PutRule",
+                    "events:DescribeRule"
+                  ],
+                  "Resource": {
+                    "Ref": "AllResources"
+                  }
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-events-execution-access"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": {
+                "Effect": "Allow",
+                "Action": "sts:AssumeRole",
+                "Resource": {
+                  "Fn::Sub": "arn:aws:iam::{{resolve:secretsmanager:${Environment}-${AppName}-account-invoice}}:role/send-message-to-requests-queue"
+                }
+              }
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-send-message-invoice"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "lambda:InvokeFunction",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-CloudWatchAlarmInvokeLambdaPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "apigateway:GET",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-ApiGatewayPermission"
+            }
+          }
+        ]
+      }
+    },
+    "RolApi": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "lambda:InvokeFunction",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-ApiInvokeLambdaPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:DescribeLogGroups",
+                    "logs:DescribeLogStreams",
+                    "logs:PutLogEvents",
+                    "logs:GetLogEvents",
+                    "logs:FilterLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-ApiLogPermission"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*",
+                    "s3-object-lambda:*"
+                  ],
+                  "Resource": {
+                    "Ref": "AllResources"
+                  }
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-s3-log-access"
+            }
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution",
+                    "states:StartSyncExecution"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": {
+              "Fn::Sub": "${Environment}-${AppName}-ApiStepFunctionsPermission"
+            }
+          }
+        ]
+      }
+    },
+    "LGAPI": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "RetentionInDays": 365
+      },
+      "DeletionPolicy": "Retain"
+    },
+    "Api": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "DependsOn": [
+        "StackAuthorizerLambda",
+        "StackCognito"
+      ],
+      "Properties": {
+        "Body": {
+          "Fn::Transform": {
+            "Name": "AWS::Include",
+            "Parameters": {
+              "Location": "../src/api.json"
+            }
+          }
+        },
+        "Name": {
+          "Fn::Sub": "${Environment}-${AppName}"
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    },
+    "WaitCondition": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "Properties": {
+        "Handle": {
+          "Ref": "WaitHandle"
+        },
+        "Timeout": "1",
+        "Count": 0
+      }
+    },
+    "AccountApi": {
+      "Type": "AWS::ApiGateway::Account",
+      "Properties": {
+        "CloudWatchRoleArn": {
+          "Fn::GetAtt": [
+            "RolApi",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "DeployApi": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "DependsOn": [
+        "WaitCondition"
+      ],
+      "Properties": {
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      },
+      "DeletionPolicy": "Retain"
+    },
+    "StageApi": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "DeploymentId": {
+          "Ref": "DeployApi"
+        },
+        "StageName": {
+          "Ref": "Environment"
+        },
+        "TracingEnabled": true,
+        "AccessLogSetting": {
+          "DestinationArn": {
+            "Fn::GetAtt": [
+              "LGAPI",
+              "Arn"
+            ]
+          },
+          "Format": "{ 'requestId':'$context.requestId', 'ip': '$context.identity.sourceIp', 'caller':'$context.identity.caller', 'user':'$context.identity.user', 'requestTime':'$context.requestTime', 'httpMethod':'$context.httpMethod', 'resourcePath':'$context.resourcePath', status:$context.status, 'protocol':'$context.protocol', 'responseLength':'$context.responseLength', 'status':'$context.status', 'apiId': '$context.apiId', 'accountId': '$context.accountId'}"
+        },
+        "CacheClusterEnabled": "true",
+        "CacheClusterSize": "0.5",
+        "MethodSettings": [
+          {
+            "ResourcePath": "/*",
+            "HttpMethod": "*",
+            "DataTraceEnabled": "true",
+            "LoggingLevel": "ERROR",
+            "MetricsEnabled": "false"
+          }
+        ]
+      }
+    },
+    "UsagePlanApi": {
+      "Type": "AWS::ApiGateway::UsagePlan",
+      "Properties": {
+        "ApiStages": [
+          {
+            "ApiId": {
+              "Ref": "Api"
+            },
+            "Stage": {
+              "Ref": "StageApi"
+            }
+          }
+        ],
+        "Description": "Custom p2p-solution usage plan",
+        "UsagePlanName": {
+          "Fn::Sub": "${Environment}-${AppName}-Plan"
+        }
+      }
+    },
+    "ApiKey": {
+      "Type": "AWS::ApiGateway::ApiKey",
+      "DependsOn": [
+        "DeployApi",
+        "Api"
+      ],
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "${Environment}-${AppName}-ApiKey"
+        },
+        "Description": "CloudFormation API Key V1",
+        "Enabled": true,
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "Api"
+            },
+            "StageName": {
+              "Ref": "StageApi"
+            }
+          }
+        ]
+      }
+    },
+    "UsagePlanKey": {
+      "Type": "AWS::ApiGateway::UsagePlanKey",
+      "Properties": {
+        "KeyId": {
+          "Ref": "ApiKey"
+        },
+        "KeyType": "API_KEY",
+        "UsagePlanId": {
+          "Ref": "UsagePlanApi"
+        }
+      }
+    },
+    "LayerCore": {
+      "DependsOn": [
+        "StckParameters"
+      ],
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "python3.11"
+        ],
+        "Content": "../src/layers/core",
+        "LayerName": {
+          "Fn::Sub": "${Environment}-${AppName}-core"
+        }
+      }
+    },
+    "LayerDbB2C": {
+      "DependsOn": [
+        "StckParameters"
+      ],
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "python3.11"
+        ],
+        "Content": "../src/layers/core_db",
+        "LayerName": {
+          "Fn::Sub": "${Environment}-${AppName}-dbb2c"
+        }
+      }
+    },
+    "SSMLayerDBB2C": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "/${Environment}/${AppName}/layer-b2c-arn"
+        },
+        "Type": "String",
+        "Value": {
+          "Ref": "LayerDbB2C"
+        }
+      }
+    },
+    "LayerPsycopg2": {
+      "DependsOn": [
+        "StckParameters"
+      ],
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "python3.9",
+          "python3.11"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "ArtifactsBucket"
+          },
+          "S3Key": "deploys/psycopg2-311.zip"
+        },
+        "LayerName": {
+          "Fn::Sub": "${Environment}-${AppName}-psycopg2"
+        }
+      }
+    },
+    "LayerLambdaPowertoolsCustom": {
+      "DependsOn": [
+        "StckParameters"
+      ],
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "python3.11"
+        ],
+        "Content": "../src/layers/lambda_powertools_custom",
+        "LayerName": {
+          "Fn::Sub": "${Environment}-${AppName}-lambda-powertools-custom"
+        }
+      }
+    },
+    "KMSP2P": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "Description": "KMS key queues",
+        "KeyPolicy": {
+          "Version": "2012-10-17",
+          "Id": {
+            "Fn::Sub": "${Environment}-${AppName}-kms-p2p"
+          },
+          "Statement": [
+            {
+              "Sid": "Enable IAM User Permissions",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
+                }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "Allow access for Key Administrators",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "RolLambda",
+                    "Arn"
+                  ]
+                }
+              },
+              "Action": "sqs:*",
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "RolLambdaArn": {
+      "Description": "Arn of rol lambda",
+      "Value": {
+        "Fn::GetAtt": [
+          "RolLambda",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

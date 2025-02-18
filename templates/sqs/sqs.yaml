@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates SQS resources
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name
+  AppName:
+    Type: String
+    Description: Project name
+  LMDP2PTransaction:
+    Type: String
+    Description: Lambda ARN to request p2p transactions
+  QueueP2PTransaction:
+    Type: String
+    Description: Queue ARN
+  
+Resources:
+  ESSQSSendSMSClient:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !Ref QueueP2PTransaction
+      FunctionName: !Ref LMDP2PTransaction
+  

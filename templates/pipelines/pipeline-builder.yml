@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: P2P solution Infrastructure
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - staging
+      - prod
+    Description: Environment name.
+    Default: dev
+  AppName:
+    Type: String
+    Default: p2p-solution
+  AppVersion:
+    Type: String
+    Default: latest
+
+Resources:
+  StackPipeline:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: StackGlobalParameters
+    Properties:
+      TemplateURL: ./pipeline.yml
+      TimeoutInMinutes: 60
+      Parameters:
+        # Environment
+        Environment: !Ref Environment
+        # artifacts to deploy
+        PrincipalTemplate: projectTemplate.json
+        ArtifactName: projectTemplate.zip
+        # buckets
+        BucketArtifactName: !Sub "{{resolve:ssm:/config/${Environment}/${AppName}/infra/bucket/artifacts}}"
+        # network
+        SubnetsIds: !Sub "/config/infra/${Environment}/${AppName}/subnets"
+        SecurityGroup: !Sub "/config/infra/${Environment}/${AppName}/security-group"
+        VpcId: !Sub "/config/infra/${Environment}/${AppName}/vpc_id"
+        AppVersion: !Ref AppVersion
+

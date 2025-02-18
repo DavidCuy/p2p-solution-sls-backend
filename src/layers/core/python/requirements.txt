@@ -1,0 +1,9 @@
+peewee~=3.15.3
+pytz>=2022.6
+wrapt~=1.14.1
+requests>=2.28.1
+python-dotenv>=0.20.0
+PyJWT~=2.7.0
+countryinfo~=0.1.2
+phonenumbers~=8.12.57
+num2words~=0.5.13

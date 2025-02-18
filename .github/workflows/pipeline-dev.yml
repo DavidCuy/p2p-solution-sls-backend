@@ -1,0 +1,22 @@
+name: Pipeline Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  execute_deploy:
+    strategy:
+      matrix:
+        environment: ["dev"]
+      fail-fast: false
+    uses: ./.github/workflows/inner-deploy-workflow.yml
+    with:
+      environment: "${{ matrix.environment }}"
+      app_version: latest
+      upload_files: true
+    secrets: inherit
+
+        
+        
