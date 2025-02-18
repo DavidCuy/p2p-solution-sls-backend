@@ -722,7 +722,7 @@
           },
           "LMDSendNotificationArn": {
             "Fn::GetAtt": [
-              "P2pTransactioNotification",
+              "P2PTransactionNotification",
               "Arn"
             ]
           },
