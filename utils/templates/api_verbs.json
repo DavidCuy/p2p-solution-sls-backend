@@ -37,8 +37,7 @@
     },
     "security": [
       {
-        "api_key": [],
-        "cognito-auth": []
+        "api_key": []
       }
     ],
     "x-amazon-apigateway-request-validator": "Validate query string parameters and headers",
