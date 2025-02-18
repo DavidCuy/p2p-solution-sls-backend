@@ -664,6 +664,30 @@
           "Fn::Sub": "${Environment}-${AppName}-lambda-powertools-custom"
         }
       }
+    },
+    "StackQueues": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "./sqs/sqs.yaml",
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "AppName": {
+            "Ref": "AppName"
+          },
+          "LMDP2PTransaction": {
+            "Fn::GetAtt": [
+              "RequestP2pTransaction",
+              "Arn"
+            ]
+          },
+          "QueueP2PTransaction": {
+            "Fn::Sub": "{{resolve:ssm:/${Environment}/${AppName}/p2p/transaction-queue/arn}}"
+          }
+        },
+        "TimeoutInMinutes": 60
+      }
     }
   },
   "Outputs": {
