@@ -14,13 +14,7 @@
       "FunctionName": {
         "Fn::Sub": "${Environment}-${AppName}-request-p2p-transaction"
       },
-      "MemorySize": {
-        "Fn::If": [
-          "isProd",
-          1024,
-          512
-        ]
-      },
+      "MemorySize": 128,
       "Timeout": 30,
       "Environment": {
         "Variables": {
