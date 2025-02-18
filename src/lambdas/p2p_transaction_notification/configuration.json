@@ -25,13 +25,14 @@
             "Ref": "AppName"
           },
           "LOG_LEVEL": "INFO",
-          "POWERTOOLS_SERVICE_NAME": ""
+          "POWERTOOLS_SERVICE_NAME": "p2p_transaction_notification"
         }
       },
       "TracingConfig": {
         "Mode": "Active"
       },
       "VpcConfig": {
+        "Ipv6AllowedForDualStack": true,
         "SecurityGroupIds": [
           {
             "Ref": "SecurityGroup"
