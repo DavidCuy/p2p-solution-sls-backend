@@ -667,6 +667,9 @@
     },
     "StackQueues": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": [
+        "RequestP2pTransaction"
+      ],
       "Properties": {
         "TemplateURL": "./sqs/sqs.yaml",
         "Parameters": {
