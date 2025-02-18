@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up Python 3.11
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "3.11"
       - name: Install Dependencies
@@ -35,7 +35,7 @@ jobs:
           python reduce_layers_sizes.py
           zip -r context-dev src templates
       - name: Upload Artifact to Deploy Job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifact
           path: context-dev.zip
@@ -55,10 +55,10 @@ jobs:
             echo "MTS_CONNECTOR_SECOND_APIKEY=-" >> "$GITHUB_ENV"
           fi
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: aws-actions/configure-aws-credentials@v1
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.DEV_AWS_ROLE_TO_ASSUME }}
           role-session-name: p2p-solution-session-name
@@ -77,16 +77,16 @@ jobs:
       BUCKET: ${{ secrets.DEV_DEPLOYMENT_BUCKET }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.DEV_AWS_ROLE_TO_ASSUME }}
           role-session-name: p2p-solution-deploy
           aws-region: ${{ secrets.DEV_AWS_REGION }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Download Artifact from Build Job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: artifact
       - name: Unpacking Artifact
