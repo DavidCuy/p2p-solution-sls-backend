@@ -25,7 +25,7 @@
             "Ref": "AppName"
           },
           "LOG_LEVEL": "INFO",
-          "POWERTOOLS_SERVICE_NAME": ""
+          "POWERTOOLS_SERVICE_NAME": "request_p2p_transaction"
         }
       },
       "TracingConfig": {
