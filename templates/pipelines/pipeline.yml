@@ -266,18 +266,15 @@ Resources:
       EventPattern:
         source:
           - aws.s3
+        resources:
+          - !Sub "arn:aws:s3:::${BucketArtifactName}"
         detail:
-          eventSource:
-            - s3.amazonaws.com
-          eventName:
-            - CopyObject
-            - PutObject
-            - CompleteMultipartUpload
-          requestParameters:
-            bucketName:
-              - !Ref BucketArtifactName
+          object:
             key:
               - !Sub "deploys/${AppName}/app-sls/${ArtifactName}"
+          reason:
+            - PutObject
+            - CompleteMultipartUpload
       Targets:
         -
           Arn:
