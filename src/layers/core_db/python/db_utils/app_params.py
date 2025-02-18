@@ -5,7 +5,7 @@ LAYER_NAME = "params"
 LOGGER = get_logger(f"layer-{LAYER_NAME}")
 
 
-class ParametersAppB2C:
+class ParametersApp:
     def __init__(self):
         # Required environment variables in local
         self.__developer = os.environ.get("DEVELOPER")

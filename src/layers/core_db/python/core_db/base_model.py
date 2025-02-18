@@ -3,8 +3,8 @@ import uuid
 from collections import namedtuple
 from typing import Union
 
-from db_utils.params import ParametersDBB2C
-from db_utils.app_params import ParametersAppB2C
+from db_utils.params import ParametersDB
+from db_utils.app_params import ParametersApp
 
 from peewee import (
     Model,
@@ -19,8 +19,8 @@ from psycopg2 import extensions
 
 __all__ = ["BaseModel", "database"]
 
-PARAMETER_DB = ParametersDBB2C()
-PARAMETER_APP = ParametersAppB2C()
+PARAMETER_DB = ParametersDB()
+PARAMETER_APP = ParametersApp()
 
 if not PARAMETER_APP.developer and not PARAMETER_APP.lambda_name:
     raise KeyError('Please define the environment variable "DEVELOPER" with your name.')

@@ -4,13 +4,13 @@ from typing import Dict, Any
 from db_aws.secret_manager import get_secret
 from db_aws.ssm import get_parameter
 from db_utils.logger import get_logger
-from db_utils.app_params import ParametersAppB2C
+from db_utils.app_params import ParametersApp
 
 LAYER_NAME = "params"
 LOGGER = get_logger(f"layer-{LAYER_NAME}")
 
 
-class ParametersDBB2C:
+class ParametersDB:
     def __init__(self):
         self.__db_name = os.environ.get("DB_NAME")
         self.__db_user = os.environ.get("DB_USER")
@@ -40,7 +40,7 @@ class ParametersDBB2C:
         return self.__db_port
 
     def __override_params(self):
-        parameter_app = ParametersAppB2C()
+        parameter_app = ParametersApp()
         db_config: Dict[str, Any] = get_parameter(f"/config/infra/{parameter_app.environment}/db/credentials",
                                                   use_prefix=False, transform=True)
         if not self.__db_port and not self.__db_host and not self.__db_name:

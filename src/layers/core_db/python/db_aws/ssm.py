@@ -3,7 +3,7 @@ from typing import Any, Union, Dict
 
 from aws_lambda_powertools.utilities import parameters
 from aws_lambda_powertools.utilities.parameters.exceptions import GetParameterError
-from db_utils.app_params import ParametersAppB2C
+from db_utils.app_params import ParametersApp
 from db_utils.logger import get_logger
 
 __all__ = ["get_parameter"]
@@ -12,7 +12,7 @@ LAYER_NAME = "ssm"
 
 LOGGER = get_logger(f"layer-{LAYER_NAME}")
 
-PARAMETERS_APP = ParametersAppB2C()
+PARAMETERS_APP = ParametersApp()
 PARAMETERS_PREFIX = f"/{PARAMETERS_APP.environment}/{PARAMETERS_APP.app_name}"
 
 

@@ -2,14 +2,14 @@ from typing import Any
 
 from aws_lambda_powertools.utilities import parameters
 from aws_lambda_powertools.utilities.parameters import GetParameterError
-from db_utils.app_params import ParametersAppB2C
+from db_utils.app_params import ParametersApp
 from db_utils.logger import get_logger
 
 LAYER_NAME = "secret_manager"
 
 LOGGER = get_logger(f"layer-{LAYER_NAME}")
 
-PARAMETERS_APP = ParametersAppB2C()
+PARAMETERS_APP = ParametersApp()
 SECRETS_PREFIX = f"{PARAMETERS_APP.environment}-{PARAMETERS_APP.app_name}"
 GLOBAL_SECRETS_PREFIX = f"{PARAMETERS_APP.environment}-{PARAMETERS_APP.app_name}"
 
