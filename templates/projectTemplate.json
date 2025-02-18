@@ -471,10 +471,6 @@
     },
     "Api": {
       "Type": "AWS::ApiGateway::RestApi",
-      "DependsOn": [
-        "StackAuthorizerLambda",
-        "StackCognito"
-      ],
       "Properties": {
         "Body": {
           "Fn::Transform": {
@@ -619,9 +615,6 @@
       }
     },
     "LayerCore": {
-      "DependsOn": [
-        "StckParameters"
-      ],
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": [
@@ -634,9 +627,6 @@
       }
     },
     "LayerDbB2C": {
-      "DependsOn": [
-        "StckParameters"
-      ],
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": [
@@ -661,9 +651,6 @@
       }
     },
     "LayerPsycopg2": {
-      "DependsOn": [
-        "StckParameters"
-      ],
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": [
@@ -682,9 +669,6 @@
       }
     },
     "LayerLambdaPowertoolsCustom": {
-      "DependsOn": [
-        "StckParameters"
-      ],
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": [
