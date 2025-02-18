@@ -10,17 +10,10 @@ permissions:
   contents: read     
 
 jobs:
-  set_variables:
-    name: "Set Environment Variables"
-    runs-on: ubuntu-latest
-    outputs:
-      environment: dev
-      app_version: latest
       
   build:
-    name: "Build - ${{ needs.set_variables.outputs.environment }}"
+    name: "Build - dev"
     runs-on: ubuntu-latest
-    needs: set_variables
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -40,22 +33,21 @@ jobs:
         run: |
           apm project synth
           python reduce_layers_sizes.py
-          zip -r context-${{ needs.set_variables.outputs.environment }} src templates
+          zip -r context-dev src templates
       - name: Upload Artifact to Deploy Job
         uses: actions/upload-artifact@v3
         with:
           name: artifact
-          path: context-${{ needs.set_variables.outputs.environment }}.zip
+          path: context-dev.zip
 
   deploy_pipelines:
-    name: "Deploy - builder-pipeline ${{ needs.set_variables.outputs.environment }}"
-    needs: [ set_variables, build ]
+    name: "Deploy - builder-pipeline dev"
+    needs: [ build ]
     runs-on: ubuntu-latest
-    environment: ${{ needs.set_variables.outputs.environment }}
     env:
-      ENVIRONMENT: ${{ needs.set_variables.outputs.environment }}
+      ENVIRONMENT: dev
       BUCKET: ${{ secrets.DEV_DEPLOYMENT_BUCKET }}
-      APP_VERSION: "${{ needs.set_variables.outputs.app_version }}"
+      APP_VERSION: "latest"
     steps:
       - name: Set environment variables
         run: |
@@ -78,9 +70,8 @@ jobs:
           aws cloudformation deploy --template-file ./templates/pipelines/pipeline-builder.yml --stack-name $ENVIRONMENT-p2p-solution-pipelines --parameter-overrides Environment=$ENVIRONMENT AppName=p2p-solution AppVersion=$APP_VERSION --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM CAPABILITY_IAM
 
   deploy:
-    name: "Deploy - ${{ needs.set_variables.outputs.environment }}"
-    needs: [ set_variables, deploy_pipelines ]
-    environment: ${{ needs.set_variables.outputs.environment }}
+    name: "Deploy - dev"
+    needs: [ deploy_pipelines ]
     runs-on: ubuntu-latest
     env:
       BUCKET: ${{ secrets.DEV_DEPLOYMENT_BUCKET }}
@@ -101,7 +92,7 @@ jobs:
       - name: Unpacking Artifact
         run: |
           sudo apt install zip unzip
-          unzip  -o  context-${{ needs.set_variables.outputs.environment }}.zip
+          unzip  -o  context-dev.zip
       - name: Deploy Project
         run: |
           for t in $(find ./templates -not -path "./templates/pipelines/*" -name '*.yaml' -or -name '*.json' -and -not -name '*.asl.*');
