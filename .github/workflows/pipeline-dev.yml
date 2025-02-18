@@ -66,7 +66,7 @@ jobs:
       - name: Deploy Pipeline
         run: |
           aws s3 cp psycopg2.zip s3://$BUCKET/deploys/psycopg2-311.zip
-          aws cloudformation package --template-file ./templates/pipelines/pipeline-builder.yml --s3-bucket $BUCKET --s3-prefix deploys/p2p-solution --output-template-file ./templates/pipelines/pipeline-builder.yml
+          aws cloudformation package --template-file ./templates/pipelines/pipeline-builder.yml --s3-bucket $BUCKET --s3-prefix deploys/p2p-solution/app-sls --output-template-file ./templates/pipelines/pipeline-builder.yml
           aws cloudformation deploy --template-file ./templates/pipelines/pipeline-builder.yml --stack-name $ENVIRONMENT-p2p-solution-pipelines --parameter-overrides Environment=$ENVIRONMENT AppName=p2p-solution AppVersion=$APP_VERSION --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM CAPABILITY_IAM
 
   deploy:
@@ -97,14 +97,14 @@ jobs:
         run: |
           for t in $(find ./templates -not -path "./templates/pipelines/*" -name '*.yaml' -or -name '*.json' -and -not -name '*.asl.*');
             do
-              aws cloudformation package --template-file $t --s3-bucket $BUCKET --output-template-file $t --s3-prefix deploys/p2p-solution/
+              aws cloudformation package --template-file $t --s3-bucket $BUCKET --output-template-file $t --s3-prefix deploys/p2p-solution/app-sls/
               if [ "${t}" != "./templates/projectTemplate.json" ]
               then
                   sub_path=${t#"./templates/"}
-                  aws s3 cp $t s3://$BUCKET/deploys/p2p-solution/$sub_path
+                  aws s3 cp $t s3://$BUCKET/deploys/p2p-solution/app-sls/$sub_path
               fi
             done
           
           cd templates
           zip -r projectTemplate.zip ./projectTemplate.json
-          aws s3 cp projectTemplate.zip s3://$BUCKET/deploys/p2p-solution/projectTemplate.zip
+          aws s3 cp projectTemplate.zip s3://$BUCKET/deploys/p2p-solution/app-sls/projectTemplate.zip

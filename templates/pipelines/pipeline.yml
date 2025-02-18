@@ -215,7 +215,7 @@ Resources:
                 - Name: SourceOutput
               Configuration:
                 S3Bucket: !Ref BucketArtifactName
-                S3ObjectKey: !Sub "deploys/${AppName}/${ArtifactName}"
+                S3ObjectKey: !Sub "deploys/${AppName}/app-sls/${ArtifactName}"
                 PollForSourceChanges: false
               RunOrder: 1
         - Name: Deploy
@@ -236,7 +236,7 @@ Resources:
                   - - SourceOutput
                     - !Ref PrincipalTemplate
                 RoleArn: !GetAtt
-                  - RoleCloudFormationR
+                  - RoleCloudFormation
                   - Arn
                 ParameterOverrides: !Sub '{"Environment": "${Environment}", "ArtifactsBucket": "${BucketArtifactName}", "SubnetsIds": "${SubnetsIds}", "SecurityGroup": "${SecurityGroup}", "VpcId": "${VpcId}"}'
               RunOrder: 1
@@ -270,7 +270,7 @@ Resources:
         detail:
           object:
             key:
-              - !Sub "deploys/${AppName}/${ArtifactName}"
+              - !Sub "deploys/${AppName}/app-sls/${ArtifactName}"
           reason:
             - PutObject
             - CompleteMultipartUpload
