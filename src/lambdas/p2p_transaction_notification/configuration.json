@@ -1,0 +1,66 @@
+{
+  "cfn": {
+    "Type": "AWS::Lambda::Function",
+    "Properties": {
+      "Code": "../src/lambdas/p2p_transaction_notification",
+      "Handler": "lambda_function.lambda_handler",
+      "Role": {
+        "Fn::GetAtt": [
+          "RolLambda",
+          "Arn"
+        ]
+      },
+      "Runtime": "python3.11",
+      "FunctionName": {
+        "Fn::Sub": "${Environment}-${AppName}-p2p_transaction_notification"
+      },
+      "MemorySize": 128,
+      "Timeout": 30,
+      "Environment": {
+        "Variables": {
+          "ENVIRONMENT": {
+            "Ref": "Environment"
+          },
+          "APP_NAME": {
+            "Ref": "AppName"
+          },
+          "LOG_LEVEL": "INFO",
+          "POWERTOOLS_SERVICE_NAME": ""
+        }
+      },
+      "TracingConfig": {
+        "Mode": "Active"
+      },
+      "VpcConfig": {
+        "SecurityGroupIds": [
+          {
+            "Ref": "SecurityGroup"
+          }
+        ],
+        "SubnetIds": {
+          "Fn::Split": [
+            ",",
+            {
+              "Ref": "SubnetsIds"
+            }
+          ]
+        }
+      },
+      "Layers": [
+        {
+          "Ref": "LayerCore"
+        },
+        {
+          "Ref": "LayerPsycopg2"
+        },
+        {
+          "Ref": "LayerLambdaPowertoolsCustom"
+        },
+        {
+          "Ref": "LayerDbB2C"
+        }
+      ]
+    }
+  },
+  "swagger": {}
+}

@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Rule to execute notification for p2p transaction
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - staging
+      - prod
+    Default: dev
+  AppName:
+    Type: String
+    Description: Project name
+  LMDSendNotificationArn:
+    Type: String
+  P2PTrxBusName:
+    Type: String
+    Description: Arn de bus de eventos de transacciones p2p
+Resources:
+  P2PTrxExecuteEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Disparador del evento
+      EventBusName: !Ref P2PTrxBusName
+      EventPattern:
+        source:
+          - "lambda"
+        detail-type:
+          - "Send Notification"
+      State: ENABLED
+      Targets:
+        - Arn: !Ref LMDSendNotificationArn
+          Id: "EventBridgeRuleTriggerNotP2PTrx"
+  
+  PermissionForEventsToInvokeLambdaP2PTrxNot:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LMDSendNotificationArn
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt P2PTrxExecuteEventRule.Arn
+
+  
+Outputs:
+  P2PTrxExecuteEventRuleArn:
+    Description: ARN event bridge rule to execute lambda function
+    Value: !GetAtt P2PTrxExecuteEventRule.Arn

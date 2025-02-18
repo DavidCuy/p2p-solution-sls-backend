@@ -691,6 +691,46 @@
         },
         "TimeoutInMinutes": 60
       }
+    },
+    "BusesStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "./eventbridge/buses.yaml",
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "AppName": {
+            "Ref": "AppName"
+          }
+        }
+      }
+    },
+    "P2PTrxNotificationStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "./eventbridge/not_event_p2p_trx.yaml",
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "AppName": {
+            "Ref": "AppName"
+          },
+          "LMDSendNotificationArn": {
+            "Fn::GetAtt": [
+              "P2pTransactioNotification",
+              "Arn"
+            ]
+          },
+          "P2PTrxBusName": {
+            "Fn::GetAtt": [
+              "BusesStack",
+              "Outputs.P2PTrxBusArnOutput"
+            ]
+          }
+        }
+      }
     }
   },
   "Outputs": {

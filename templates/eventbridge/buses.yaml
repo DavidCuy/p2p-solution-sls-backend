@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Buses for p2p application
+Parameters:
+  AppName:
+    Type: String
+    Description: The project name
+  Environment:
+    Type: String
+    Description: Specify the Environment type of the stack.
+    AllowedValues:
+      - dev
+      - qa
+      - staging
+      - prod
+Resources:
+  P2PTrxResponseBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Description: "Bus de Eventos para las notificaciones de transacciones p2p"
+      Name: !Sub ${Environment}-${AppName}-p2p_trx_bus
+Outputs:
+  P2PTrxBusnameOutput:
+    Value: !Ref P2PTrxResponseBus
+  P2PTrxBusArnOutput:
+    Value: !GetAtt P2PTrxResponseBus.Arn
