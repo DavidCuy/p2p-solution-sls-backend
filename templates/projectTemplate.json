@@ -708,6 +708,9 @@
     },
     "P2PTrxNotificationStack": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": [
+        "P2pTransactioNotification"
+      ],
       "Properties": {
         "TemplateURL": "./eventbridge/not_event_p2p_trx.yaml",
         "Parameters": {
