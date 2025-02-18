@@ -321,21 +321,6 @@
           {
             "PolicyDocument": {
               "Version": "2012-10-17",
-              "Statement": {
-                "Effect": "Allow",
-                "Action": "sts:AssumeRole",
-                "Resource": {
-                  "Fn::Sub": "arn:aws:iam::{{resolve:secretsmanager:${Environment}-${AppName}-account-invoice}}:role/send-message-to-requests-queue"
-                }
-              }
-            },
-            "PolicyName": {
-              "Fn::Sub": "${Environment}-${AppName}-send-message-invoice"
-            }
-          },
-          {
-            "PolicyDocument": {
-              "Version": "2012-10-17",
               "Statement": [
                 {
                   "Effect": "Allow",
