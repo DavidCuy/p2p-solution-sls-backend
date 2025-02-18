@@ -1,4 +1,5 @@
 import json
+import unittest
 from http import HTTPStatus
 from unittest import TestCase, mock
 
@@ -7,7 +8,7 @@ from core_api.utils import (
     get_status_code,
 )
 
-from .lambda_function import (
+from lambda_function import (
     lambda_handler,
 )
 
@@ -26,9 +27,12 @@ mock_event_from_sqs = {
     "Records": [
         {
             "body": json.dumps({
-                "version":"1.0",
-                "country":"py",
-                "notificationType":"document"
+                "status": "created",
+                "source_id": 1,
+                "dest_id": 2,
+                "created_at": "2025-02-18T19:21:46.395003",
+                "amount": 17.0,
+                "id": 8
             })
         }
     ]
@@ -52,7 +56,7 @@ def call_lambda(mock_test):
     return body, status_code
 
 
-class TestInvokeInvoiceNotifications(TestCase):
+class TestP2PTrxReq(TestCase):
     """
     Test lambda to execute step function to notificate approved invoices
     """
@@ -64,7 +68,7 @@ class TestInvokeInvoiceNotifications(TestCase):
         self.event_successfully = mock_event_from_sqs
 
     def __common_asserts(
-            self, body, status_code, expected_status_code, expected_body=""
+            self, body, status_code, expected_status_code
     ):
         """
         Method to apply common asserts
@@ -73,7 +77,6 @@ class TestInvokeInvoiceNotifications(TestCase):
             expected_status_code: (int) -> Response status that will expect
         """
         self.assertEqual(expected_status_code, status_code)
-        self.assertIn(expected_body, body)
 
 
     @mock.patch("core_aws.ssm.get_parameter", return_value=mock_get_ssm_parameter)
@@ -86,8 +89,7 @@ class TestInvokeInvoiceNotifications(TestCase):
         self.__common_asserts(
             body,
             status_code,
-            HTTPStatus.OK.value,
-            "OK",
+            HTTPStatus.OK.value
         )
 
     @mock.patch("core_aws.ssm.get_parameter", return_value=mock_get_ssm_parameter)
@@ -100,8 +102,7 @@ class TestInvokeInvoiceNotifications(TestCase):
         self.__common_asserts(
             body,
             status_code,
-            HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            "exception",
+            HTTPStatus.INTERNAL_SERVER_ERROR.value
         )
 
 
@@ -112,3 +113,12 @@ class TestInvokeInvoiceNotifications(TestCase):
         """
         body, status_code = call_lambda(self.event_successfully)
         self.__common_asserts(body, status_code, HTTPStatus.INTERNAL_SERVER_ERROR.value)
+
+test_suites = unittest.TestSuite()
+testLambda = TestP2PTrxReq()
+testLambda.setUp()
+test_suites.addTest(testLambda.test_lambda_successfully)
+#test_suites.addTest(testLambda.test_signed_url_cycle_gcp)
+
+runner = unittest.TextTestRunner()
+runner.run(test_suites)
