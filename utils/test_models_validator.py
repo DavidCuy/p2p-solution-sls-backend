@@ -2,7 +2,7 @@
 from unittest import TestCase
 
 import peewee
-from db_b2c.base_model import BaseModel
+from core_db.base_model import BaseModel
 from core_utils.utils import (
     compare_iterables,
 )

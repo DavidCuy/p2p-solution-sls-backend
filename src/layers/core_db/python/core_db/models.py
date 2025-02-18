@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from db_b2c.base_model import BaseModel
+from core_db.base_model import BaseModel
 from peewee import (SQL, AutoField, BigAutoField, BigIntegerField,
                     BooleanField, CharField, CompositeKey, DateField,
                     DateTimeField, DecimalField, DoubleField, ForeignKeyField,

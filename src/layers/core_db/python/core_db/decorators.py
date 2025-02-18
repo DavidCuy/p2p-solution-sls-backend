@@ -24,8 +24,8 @@ def transaction_for_test(database=None):
 
     Examples
     --------
-    >>> from db_b2c.decorators import transaction_for_test
-    >>> from db_b2c.base_model import database
+    >>> from core_db.decorators import transaction_for_test
+    >>> from core_db.base_model import database
     >>> @transaction_for_test(database=database)
     ... def test_function():
     ...     pass

@@ -3,8 +3,8 @@
 
 import inspect
 
-import db_b2c.base_model
-import db_b2c.models
+import core_db.base_model
+import core_db.models
 import peewee
 
 
@@ -22,7 +22,7 @@ class Validator:
     def get_all_models(self):
         return [
             (obj, _name)
-            for _name, obj in inspect.getmembers(db_b2c.models)
+            for _name, obj in inspect.getmembers(core_db.models)
             if inspect.isclass(obj) and issubclass(obj, peewee.Model)
         ]
 
@@ -36,7 +36,7 @@ class Validator:
             except Exception as details:
                 self._print(self.fmt.format(name, 0, 1, f"{details}"))
                 self._print("-" * len(self.f))
-                db_b2c.base_model.database.rollback()
+                core_db.base_model.database.rollback()
                 result["error"].append(name)
             else:
                 self._print(self.fmt.format(name, 1, 0, "ok"))
