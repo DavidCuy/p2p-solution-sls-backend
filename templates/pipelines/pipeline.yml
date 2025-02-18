@@ -163,14 +163,6 @@ Resources:
                   - "elasticache:*"
                 Resource: !Ref AllResources
             Version: 2012-10-17
-        - PolicyName: !Sub "${Environment}-${AppName}-CloudFormation-CDLayer-Policy"
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "lambda:*"
-                Resource: !Sub '{{resolve:ssm:/${Environment}/${AppName}/customer-data/layer/arn}}'
-            Version: 2012-10-17
 
   # Pipeline
   PipelineEventRole:
