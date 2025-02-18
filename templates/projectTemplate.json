@@ -492,6 +492,9 @@
         }
       }
     },
+    "WaitHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle"
+    },
     "WaitCondition": {
       "Type": "AWS::CloudFormation::WaitCondition",
       "Properties": {
