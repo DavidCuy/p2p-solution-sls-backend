@@ -190,7 +190,7 @@ Resources:
   Pipeline:
     Type: "AWS::CodePipeline::Pipeline"
     Properties:
-      Name: !Sub "${Environment}-${AppName}-pipeline"
+      Name: !Sub "${Environment}-${AppName}-sls-pipeline"
       RoleArn: !GetAtt
         - RoleCodePipeline
         - Arn
@@ -220,8 +220,8 @@ Resources:
                 Provider: CloudFormation
               Configuration:
                 ActionMode: CHANGE_SET_REPLACE
-                ChangeSetName: !Sub "${Environment}-${AppName}-changeSet"
-                StackName: !Sub "${Environment}-${AppName}-stack"
+                ChangeSetName: !Sub "${Environment}-${AppName}-sls-changeSet"
+                StackName: !Sub "${Environment}-${AppName}-sls-stack"
                 Capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND"
                 TemplatePath: !Join
                   - "::"
@@ -242,8 +242,8 @@ Resources:
                 Provider: CloudFormation
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
-                ChangeSetName: !Sub "${Environment}-${AppName}-changeSet"
-                StackName: !Sub "${Environment}-${AppName}-stack"
+                ChangeSetName: !Sub "${Environment}-${AppName}-sls-changeSet"
+                StackName: !Sub "${Environment}-${AppName}-sls-stack"
               RunOrder: 2
               InputArtifacts:
                 - Name: SourceOutput

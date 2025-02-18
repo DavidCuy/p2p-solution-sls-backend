@@ -692,45 +692,6 @@
           "Fn::Sub": "${Environment}-${AppName}-lambda-powertools-custom"
         }
       }
-    },
-    "KMSP2P": {
-      "Type": "AWS::KMS::Key",
-      "Properties": {
-        "Description": "KMS key queues",
-        "KeyPolicy": {
-          "Version": "2012-10-17",
-          "Id": {
-            "Fn::Sub": "${Environment}-${AppName}-kms-p2p"
-          },
-          "Statement": [
-            {
-              "Sid": "Enable IAM User Permissions",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": {
-                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
-                }
-              },
-              "Action": "kms:*",
-              "Resource": "*"
-            },
-            {
-              "Sid": "Allow access for Key Administrators",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": {
-                  "Fn::GetAtt": [
-                    "RolLambda",
-                    "Arn"
-                  ]
-                }
-              },
-              "Action": "sqs:*",
-              "Resource": "*"
-            }
-          ]
-        }
-      }
     }
   },
   "Outputs": {
