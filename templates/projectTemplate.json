@@ -668,7 +668,7 @@
     "StackQueues": {
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": [
-        "RequestP2pTransaction"
+        "RequestP2PTransaction"
       ],
       "Properties": {
         "TemplateURL": "./sqs/sqs.yaml",
@@ -681,7 +681,7 @@
           },
           "LMDP2PTransaction": {
             "Fn::GetAtt": [
-              "RequestP2pTransaction",
+              "RequestP2PTransaction",
               "Arn"
             ]
           },
