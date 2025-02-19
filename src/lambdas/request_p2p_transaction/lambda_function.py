@@ -32,7 +32,7 @@ def lambda_handler(event: dict, _):
     }
     for record in records:
         body = get_body(record)
-        LOGGER.info(f'{20 * '*'}  Processing banking request  {20 * '*'}')
+        LOGGER.info(f"{20 * '*'}  Processing banking request  {20 * '*'}")
 
         trx_reg = P2Ptransaction.get_by_id(body.get('id', None))
         LOGGER.info(trx_reg)
