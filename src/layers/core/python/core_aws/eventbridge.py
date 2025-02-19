@@ -6,6 +6,7 @@ from botocore.exceptions import (
 )
 from core_utils.utils import (
     get_logger,
+    cast_default
 )
 from datetime import datetime
 
@@ -61,7 +62,7 @@ def put_event(*, event_name: str, event_input: dict, source: str = 'lambda', bus
                 'Time': datetime.now(),
                 'Source': source,
                 'DetailType': event_name,
-                'Detail': json.dumps(event_input),
+                'Detail': json.dumps(event_input, default=cast_default, ensure_ascii=False),
                 'EventBusName': bus_name
             },
         ]

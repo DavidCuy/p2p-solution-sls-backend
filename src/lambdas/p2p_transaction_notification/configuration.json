@@ -32,7 +32,6 @@
         "Mode": "Active"
       },
       "VpcConfig": {
-        "Ipv6AllowedForDualStack": true,
         "SecurityGroupIds": [
           {
             "Ref": "SecurityGroup"
