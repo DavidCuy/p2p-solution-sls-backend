@@ -18,6 +18,15 @@ Resources:
     Properties:
       Description: "Bus de Eventos para las notificaciones de transacciones p2p"
       Name: !Sub ${Environment}-${AppName}-p2p_trx_bus
+  
+  SSMP2PTransactionBusArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${Environment}/${AppName}/p2p/transaction-bus/arn"
+      Tier: "Standard"
+      Type: "String"
+      Value: !GetAtt P2PTrxResponseBus.Arn
+
 Outputs:
   P2PTrxBusnameOutput:
     Value: !Ref P2PTrxResponseBus

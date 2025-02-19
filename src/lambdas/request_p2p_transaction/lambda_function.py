@@ -5,6 +5,7 @@ from core_decorators import requester_patch
 from core_utils.utils import get_logger, get_body
 from core_decorators.logs import lambda_logger
 from playhouse.shortcuts import model_to_dict
+from db_aws.ssm import get_parameter
 
 from core_db.models import P2Ptransaction
 from datetime import datetime
@@ -14,6 +15,7 @@ import uuid
 requester_patch()
 LOGGER = get_logger()
 
+TRX_BUS_ARN = get_parameter("p2p/transaction-bus/arn")
 
 @lambda_logger(logger=LOGGER)
 def lambda_handler(event: dict, _):
@@ -75,7 +77,8 @@ def lambda_handler(event: dict, _):
 
         status = core_aws.eventbridge.put_event(
             event_name=event_details['name'],
-            event_input=event_details['details']
+            event_input=event_details['details'],
+            bus_name=TRX_BUS_ARN
         )
 
         
