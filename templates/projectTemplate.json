@@ -226,25 +226,6 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "amplify:*"
-                  ],
-                  "Resource": {
-                    "Ref": "AllResources"
-                  }
-                }
-              ]
-            },
-            "PolicyName": {
-              "Fn::Sub": "${Environment}-${AppName}-amplify-access"
-            }
-          },
-          {
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": [
                     "ssm:GetParameters",
                     "ssm:GetParameter"
                   ],
@@ -284,29 +265,10 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "states:StartExecution",
-                    "states:DescribeExecution",
-                    "states:StopExecution",
-                    "states:ListExecutions"
-                  ],
-                  "Resource": "*"
-                }
-              ]
-            },
-            "PolicyName": {
-              "Fn::Sub": "${Environment}-${AppName}-step-function-access"
-            }
-          },
-          {
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": [
                     "events:PutTargets",
                     "events:PutRule",
-                    "events:DescribeRule"
+                    "events:DescribeRule",
+                    "events:PutEvents"
                   ],
                   "Resource": {
                     "Ref": "AllResources"
